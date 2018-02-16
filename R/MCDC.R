@@ -44,6 +44,8 @@
 
 mcdc <- function(X, K, v0 = NULL, split.index = NULL, minsize = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
 
+  if(is.data.frame(X)) X <- as.matrix(X)
+  
   if(is.null(verb)) verb = 0
 
   # set parameters for clustering and optimisation
@@ -178,7 +180,7 @@ mcdc <- function(X, K, v0 = NULL, split.index = NULL, minsize = NULL, verb = NUL
   # determine cluster assignment vector
 
   asgn <- numeric(n) + 1
-  for(i in 1:K) asgn[ixs[[2*i-1]]] <- i
+  for(i in 1:(K-1)) asgn[ixs[[2*i]]] <- i+1
 
   # find the actual location of each node in the hierarchy
 
@@ -337,6 +339,9 @@ mcpp <- function(v, X, P, verb, labels, maxit, ftol){
 # params = list of parameters used to find H(v, b)
 
 mch <- function(X, v0 = NULL, minsize = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
+  
+  if(is.data.frame(X)) X <- as.matrix(X)
+  
   params = list()
 
   if(is.null(minsize)) params$nmin <- 1

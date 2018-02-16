@@ -45,6 +45,8 @@
 
 mddc <- function(X, K, minsize = NULL, split.index = NULL, v0 = NULL, bandwidth = NULL, alphamin = NULL, alphamax = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
 
+  if(is.data.frame(X)) X <- as.matrix(X)
+  
   if(is.null(verb)) verb = 0
   # set parameters for clustering and optimisation
 
@@ -189,8 +191,8 @@ mddc <- function(X, K, minsize = NULL, split.index = NULL, v0 = NULL, bandwidth 
 
   # create cluster assignment vector for the complete hierarchy
 
-  asgn <- numeric(n)
-  for(i in 1:(K-1)) asgn[ixs[[2*i]]] <- i
+  asgn <- numeric(n)+1
+  for(i in 1:(K-1)) asgn[ixs[[2*i]]] <- i+1
 
   # determine actual locations of the nodes (not their would-be location within a complete tree)
 
@@ -477,6 +479,8 @@ md_b <- function(v, X, P){
 
 mdh <- function(X, v0 = NULL, minsize = NULL, bandwidth = NULL, alphamin = NULL, alphamax = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
 
+  if(is.data.frame(X)) X <- as.matrix(X)
+  
   params <- list()
 
   if(is.null(minsize)) params$nmin <- 1

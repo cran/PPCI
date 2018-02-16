@@ -44,7 +44,9 @@
 # $args = list of (functional) arguments passed to ncutdc
 
 ncutdc <- function(X, K, split.index = NULL, v0 = NULL, s = NULL, minsize = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
-
+  
+  if(is.data.frame(X)) X <- as.matrix(X)
+  
   if(is.null(verb)) verb = 0
 
   # set parameters for clustering and optimisation
@@ -167,8 +169,8 @@ ncutdc <- function(X, K, split.index = NULL, v0 = NULL, s = NULL, minsize = NULL
 
   # create cluster assignment vector for the complete hierarchy
 
-  asgn <- numeric(n)
-  for(i in 1:(K-1)) asgn[ixs[[2*i]]] <- i
+  asgn <- numeric(n)+1
+  for(i in 1:(K-1)) asgn[ixs[[2*i]]] <- i+1
 
   # determine actual locations of the nodes (not their would-be location within a complete tree)
 
@@ -220,6 +222,8 @@ ncutdc <- function(X, K, split.index = NULL, v0 = NULL, s = NULL, minsize = NULL
 
 ncuth <- function(X, v0 = NULL, s = NULL, minsize = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
 
+  if(is.data.frame(X)) X <- as.matrix(X)
+  
   params = list()
 
   if(is.null(minsize)) params$nmin <- 1
