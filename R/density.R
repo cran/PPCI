@@ -46,7 +46,7 @@
 mddc <- function(X, K, minsize = NULL, split.index = NULL, v0 = NULL, bandwidth = NULL, alphamin = NULL, alphamax = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
 
   if(is.data.frame(X)) X <- as.matrix(X)
-  
+
   if(is.null(verb)) verb = 0
   # set parameters for clustering and optimisation
 
@@ -95,11 +95,9 @@ mddc <- function(X, K, minsize = NULL, split.index = NULL, v0 = NULL, bandwidth 
   # compute the split(s) at the root node, and choose the solution with the maximum relative depth
 
   c.split <- mdh(X, v0, minsize, bandwidth, alphamin, alphamax, verb, labels, maxit, ftol)
-  ix.opt <- which.max(unlist(lapply(c.split, function(sol) sol$rel.dep)))
-  c.split <- c.split[[ix.opt]]
 
   if(c.split$rel.dep>0) split_indices[1] <- split.index(c.split$v, X, c.split$params)
-  else split.indices[1] <- -Inf
+  else split_indices[1] <- -Inf
 
   pass <- list(which(c.split$cluster==2))
 
@@ -128,8 +126,6 @@ mddc <- function(X, K, minsize = NULL, split.index = NULL, v0 = NULL, bandwidth 
     ixs[[n.clust+2]] <- ixs[[id]][-pass[[id]]]
 
     c.split <- mdh(X[ixs[[n.clust+1]],], v0, minsize, bandwidth, alphamin, alphamax, verb, labels[ixs[[n.clust+1]]], maxit, ftol)
-    ix.opt <- which.max(unlist(lapply(c.split, function(sol) sol$rel.dep)))
-    c.split <- c.split[[ix.opt]]
 
     if(c.split$rel.dep==0) split_indices[n.clust+1] <- -Inf
     else split_indices[n.clust+1] <- split.index(c.split$v, X[ixs[[n.clust+1]],], c.split$params)
@@ -151,8 +147,6 @@ mddc <- function(X, K, minsize = NULL, split.index = NULL, v0 = NULL, bandwidth 
     Parent[n.clust+1] <- id
 
     c.split <- mdh(X[ixs[[n.clust+2]],], v0, minsize, bandwidth, alphamin, alphamax, verb, labels[ixs[[n.clust+2]]], maxit, ftol)
-    ix.opt <- which.max(unlist(lapply(c.split, function(sol) sol$rel.dep)))
-    c.split <- c.split[[ix.opt]]
 
     if(c.split$rel.dep==0) split_indices[n.clust+2] <- -Inf
     else split_indices[n.clust+2] <- split.index(c.split$v, X[ixs[[n.clust+2]],], c.split$params)
@@ -207,8 +201,11 @@ mddc <- function(X, K, minsize = NULL, split.index = NULL, v0 = NULL, bandwidth 
   Nodes <- list()
   for(i in 1:length(ixs)) Nodes[[i]] <- list(ixs = ixs[[i]], v = vs[i,], b = bs[i], params = pars[[i]], fval = dens[i], rel.dep = rel.deps[i], node = tree[i,], location = loci[i,])
 
-  list(cluster = asgn, model = tree, Parent = Parent, Nodes = Nodes, data = X, method = 'MDH', args = list(v0 = v0, minsize = minsize, bandwidth = bandwidth, split.index = split.index, alphamin = alphamin, alphamax = alphamax, maxit = maxit, ftol = ftol))
+  output <- list(cluster = asgn, model = tree, Parent = Parent, Nodes = Nodes, data = X, method = 'MDH', args = list(v0 = v0, minsize = minsize, bandwidth = bandwidth, split.index = split.index, alphamin = alphamin, alphamax = alphamax, maxit = maxit, ftol = ftol))
 
+  class(output) <- 'ppci_cluster_solution'
+
+  output
 }
 
 
@@ -373,15 +370,16 @@ is_minim <- function(v, X, P){
 
   p <- X%*%v/norm_vec(v)
   s <- sd(p)
-  d <- density(p, bw = P$h, from = -P$alpha*s, to = P$alpha*s, n = 100)
+  d <- density(p, bw = P$h, n = 200)
 
   # if the minimum lies at one of the boundaries then it is not a local
   # minimum of the density
 
-  bix <- which.min(d$y)
+  modes <- which(apply(rbind(d$y[3:200], d$y[2:199], d$y[1:198]), 2, function(x) x[2]>=max(x))) + 1
+  bix <- which.min(d$y[modes[1]:max(modes)]) + modes[1] - 1
 
-  if(bix%in%c(1, 100) || min(sum(p<d$x[bix]), sum(p>d$x[bix]))<P$nmin) return(FALSE)
-  else return(TRUE)
+  if(bix > modes[1] && bix < max(modes) && min(sum(p<d$x[bix]), sum(p>d$x[bix]))>P$nmin) return(TRUE)
+  else return(FALSE)
 }
 
 
@@ -480,7 +478,7 @@ md_b <- function(v, X, P){
 mdh <- function(X, v0 = NULL, minsize = NULL, bandwidth = NULL, alphamin = NULL, alphamax = NULL, verb = NULL, labels = NULL, maxit = NULL, ftol = NULL){
 
   if(is.data.frame(X)) X <- as.matrix(X)
-  
+
   params <- list()
 
   if(is.null(minsize)) params$nmin <- 1
@@ -491,7 +489,15 @@ mdh <- function(X, v0 = NULL, minsize = NULL, bandwidth = NULL, alphamin = NULL,
 
   if(is.vector(X)) n <- 1
   else n <- nrow(X)
-  if(n<(2*params$nmin)) return(list(list(cluster = numeric(n), v = numeric(ncol(rbind(c(), X))) + 1, b = NA, rel.dep = 0, fval = Inf, params = list(alpha=0,K=1000,h=1))))
+  if(n<(2*params$nmin)){
+    v <- numeric(ncol(X)) + 1/sqrt(ncol(X))
+    b <- mean(X%*%v)
+    rel.dep <- 0
+    fval <- Inf
+    cluster <- numeric(nrow(X)) + 1
+    fitted <- X[,1:2]
+    return(list(cluster = cluster, v = v, b = b, rel.dep = 0, fval = Inf, params = list(alpha=0,K=1000,h=1), fitted = fitted, data = X, method = 'MDH'))
+  }
 
 
 
@@ -541,7 +547,7 @@ mdh <- function(X, v0 = NULL, minsize = NULL, bandwidth = NULL, alphamin = NULL,
   else if(is.vector(v0)) E <- matrix(v0, ncol = 1)
   else E <- v0
 
-  output <- list()
+  hyperplanes <- list()
 
   # find the mdh arising from each column of E (v0)
 
@@ -566,9 +572,19 @@ mdh <- function(X, v0 = NULL, minsize = NULL, bandwidth = NULL, alphamin = NULL,
       depth <- 0
     }
 
-    output[[i]] <- list(cluster = pass+1, v = v, b = b + (mns%*%v)[1], rel.dep = depth, fval = fval, params = params, method = 'MDH')
+    if(ncol(X)>2) v2 <- rARPACK::eigs_sym(cov(X-X%*%v%*%t(v)), 1)$vectors
+    else v2 <- eigen(cov(X-X%*%v%*%t(v)))$vectors[,1]
 
+    hyperplanes[[i]] <- list(cluster = pass+1, v = v, b = b + (mns%*%v)[1], rel.dep = depth, fval = fval, params = params, method = 'MDH', data = t(t(X)+mns), fitted = t(t(X)+mns)%*%cbind(v, v2))
+
+    class(hyperplanes[[i]]) <- 'ppci_hyperplane_solution'
   }
+
+  best_sol <- which.max(unlist(lapply(hyperplanes, function(l) l$rel.dep)))
+
+  output <- hyperplanes[[best_sol]]
+
+  output$alternatives <- hyperplanes[-best_sol]
 
   output
 }

@@ -35,7 +35,7 @@ David Hofmeyr[aut, cre] and Nicos Pavlidis[aut]
 
 Maintainer: \packageMaintainer{PPCI}
 }
-\seealso{A \bold{MATLAB} toolbox with the same functionality as this package is available at \url{https://github.com/nicospavlidis/PPCI-MATLAB}. Outputs may differ slightly due to differences between \bold{R} and \bold{MATLAB}'s base optimisation software.}
+\seealso{A \bold{MATLAB} toolbox with similar functionality to this package is available at \url{https://github.com/nicospavlidis/opc}. Outputs may differ slightly due to differences between \bold{R} and \bold{MATLAB}'s base optimisation software.}
 \references{
 Pavlidis N.G., Hofmeyr D.P., Tasoulis S.K. (2016) Minimum Density Hyperplanes. \emph{Journal of
 Machine Learning Research}, \bold{17}(156), 1--33.

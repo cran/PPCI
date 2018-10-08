@@ -1,3 +1,63 @@
+### plot functions for classes 'ppci_cluster_solution' and 'ppci_hyperplane_solution' provide
+### wrappers for functions tree_plot, node_plot and hp_plot. Plotting an object of class
+### 'ppci_cluster_solution' will use tree_plot, representing the entire solution, if the node
+### number is not specified, otherwise it will use the function node_plot which provides a more
+### detailed view of the chosen node in the hierarchical model. plot function for class
+### 'ppci_projection_solution' plots the first two dimensions of the projected data. If argument
+### pairs is given, then pairs of dimensions are plotted agains one another.
+
+plot.ppci_cluster_solution <- function(x, node = NULL, labels = NULL, node.numbers = NULL, transparency = NULL, ...){
+  #control <- list(...)
+  if(is.null(node)) tree_plot(x, labels, node.numbers, transparency)
+  else node_plot(x, node, labels, transparency)
+}
+
+plot.ppci_hyperplane_solution <- function(x, labels = NULL, transparency = NULL, ...){
+  #control <- list(...)
+  hp_plot(x, labels, transparency)
+}
+
+plot.ppci_projection_solution <- function(x, labels = NULL, pairs = NULL, PCA = NULL, transparency = NULL, ...){
+  #control <- list(...)
+  if(is.null(transparency)) transparency = 0
+  if(!is.null(PCA) && PCA) x$fitted <- x$fitted%*%eigen(cov(x$fitted))$vectors
+  if(is.null(pairs)){
+    if(is.null(labels)){
+      if(transparency==0) plot(x$fitted[,1:2])
+      else plot(x$fitted[,1:2], col = rgb(0, 0, 0, transparency), pch = 16)
+    }
+    else{
+      lab_new <- numeric(length(labels))
+      u <- unique(labels)
+      for(i in 1:length(u)) lab_new[which(labels==u[i])] = i
+      labels <- lab_new
+      if(transparency==0) plot(x$fitted[,1:2], col = labels)
+      else plot(x$fitted[,1:2], col = sapply(labels, function(c){
+        cl = col2rgb(c)
+        rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
+      }), pch = 16)
+    }
+  }
+  else if(is.numeric(pairs)){
+    if(is.null(labels)){
+      if(transparency==0) pairs(x$fitted[,1:pairs])
+      else pairs(x$fitted[,1:pairs], col = rgb(0, 0, 0, transparency), pch = 16)
+    }
+    else{
+      lab_new <- numeric(length(labels))
+      u <- unique(labels)
+      for(i in 1:length(u)) lab_new[which(labels==u[i])] = i
+      labels <- lab_new
+      if(transparency==0) pairs(x$fitted[,1:pairs], col = labels)
+      else pairs(x$fitted[,1:pairs], col = sapply(labels, function(c){
+        cl = col2rgb(c)
+        rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
+      }), pch = 16)
+    }
+  }
+  else stop('pairs must be a positive integer')
+}
+
 ### function tree_plot provides an illustration of a complete hierarchical clustering solution
 ### arising from any of the clustering algorithms in the package. each partition in the slution
 ### is visualised through a two-dimensional plot of the data being split at the relevant node.
@@ -7,7 +67,9 @@
 #           points are coloured according to the different two-way partitions
 # node.numbers = logical. should the order in which nodes were added to the solution be indicated on the plot or not.
 
-tree_plot <- function(sol, labels = NULL, node.numbers = TRUE){
+tree_plot <- function(sol, labels = NULL, node.numbers = NULL, transparency = NULL){
+  if(is.null(transparency)) transparency = 0
+  if(is.null(node.numbers)) node.numbers <- TRUE
   op <- par(no.readonly = TRUE)
   par(mar = c(0, 0, 0, 0))
   X <- sol$data
@@ -32,14 +94,14 @@ tree_plot <- function(sol, labels = NULL, node.numbers = TRUE){
 
   # add the plots of each partition in the hierarchy recursively using add_subtree
 
-  add_subtree(sol, X, 1, 0, 1, 1, height, width, labels, node.numbers)
+  add_subtree(sol, X, 1, 0, 1, 1, height, width, labels, node.numbers, transparency)
   par(op)
 }
 
 ### function add_subtree recursively adds plots of individual two-way partitions to the existing plot.
 ### function is not intended to be called outside of tree_plot
 
-add_subtree <- function(sol, X, node, L, U, y, h, w, labels, node.numbers){
+add_subtree <- function(sol, X, node, L, U, y, h, w, labels, node.numbers, transparency){
   is.leaf <- 1-sum((sol$model[,1]==(sol$model[node,1]+1))*(sol$model[,2]==sol$model[node,2]*2))
   if(is.leaf){
     if(ncol(X)>2) v2 <- rARPACK::eigs_sym(cov(X[sol$Nodes[[node]]$ixs,]-X[sol$Nodes[[node]]$ixs,]%*%sol$Nodes[[node]]$v%*%t(sol$Nodes[[node]]$v)), 1)$vectors[,1]
@@ -48,10 +110,22 @@ add_subtree <- function(sol, X, node, L, U, y, h, w, labels, node.numbers){
     Xp[,1] <- w*.7*(Xp[,1]-min(Xp[,1]))/(max(Xp[,1])-min(Xp[,1])) + (L+U-w*.7)/2
     Xp[,2] <- h*(Xp[,2]-min(Xp[,2]))/(max(Xp[,2])-min(Xp[,2])) + y - h
     if(is.null(labels)){
-      if(sol$model[node,2]%%2) points(Xp, cex = .5, col = 4)
-      else points(Xp, col = 2, cex = .5)
+      if(sol$model[node,2]%%2){
+        if(transparency==0) points(Xp, cex = .5, col = 4)
+        else points(Xp, cex = .5, col = rgb(0, 0, 1, transparency), pch = 16)
+      }
+      else{
+        if(transparency==0) points(Xp, col = 2, cex = .5)
+        else points(Xp, col = rgb(1, 0, 0, transparency), pch = 16, cex = .5)
+      }
     }
-    else points(Xp, col = labels[sol$Nodes[[node]]$ixs], cex = .5)
+    else{
+      if(transparency==0) points(Xp, col = labels[sol$Nodes[[node]]$ixs], cex = .5)
+      else points(Xp, col = sapply(labels[sol$Nodes[[node]]$ixs], function(c){
+        cl = col2rgb(c)
+        rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
+      }), pch = 16, cex = .5)
+    }
 
     if(node.numbers) text((L+U-w*.8)/2, y-h*.9, as.character(node), cex = .7)
   }
@@ -64,9 +138,19 @@ add_subtree <- function(sol, X, node, L, U, y, h, w, labels, node.numbers){
     if(is.null(labels)){
       cols <- numeric(nrow(Xp)) + 4
       cols[which(X[sol$Nodes[[node]]$ixs,]%*%sol$Nodes[[node]]$v>sol$Nodes[[node]]$b)] <- 2
-      points(Xp, col = cols, cex = .5)
+      if(transparency==0) points(Xp, col = cols, cex = .5)
+      else points(Xp, col = sapply(cols, function(c){
+        cl = col2rgb(c)
+        rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
+      }), pch = 16, cex = .5)
     }
-    else points(Xp, col = labels[sol$Nodes[[node]]$ixs], cex = .5)
+    else{
+      if(transparency==0) points(Xp, col = labels[sol$Nodes[[node]]$ixs], cex = .5)
+      else points(Xp, col = sapply(labels[sol$Nodes[[node]]$ixs], function(c){
+        cl = col2rgb(c)
+        rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
+      }), pch = 16, cex = .5)
+    }
 
     if(node.numbers) text((L+U-w*1.1)/2, y-h*.9, as.character(node), cex = .7)
 
@@ -81,8 +165,8 @@ add_subtree <- function(sol, X, node, L, U, y, h, w, labels, node.numbers){
     segments((L+M)/2, y-1.125*h, (M+U)/2, y-1.125*h)
     segments((L+M)/2, y-1.125*h, (L+M)/2, y-1.25*h)
     segments((U+M)/2, y-1.125*h, (U+M)/2, y-1.25*h)
-    add_subtree(sol, X, k1, L, M, y - 1.25*h, h, (M-L)/w1, labels, node.numbers)
-    add_subtree(sol, X, k2, M, U, y - 1.25*h, h, (U-M)/w2, labels, node.numbers)
+    add_subtree(sol, X, k1, L, M, y - 1.25*h, h, (M-L)/w1, labels, node.numbers, transparency)
+    add_subtree(sol, X, k2, M, U, y - 1.25*h, h, (U-M)/w2, labels, node.numbers, transparency)
   }
 }
 
