@@ -1,8 +1,8 @@
-7aa4605db5c2e22057fb72a199cce05a *DESCRIPTION
+ad3943bfc649d6698852fe2940a4410c *DESCRIPTION
 6422ccdbbf38efad2cf6c4b1d12c1d2f *NAMESPACE
 63b99870a1a91431c6019243c7b61a45 *R/MCDC.R
 1dd1fb08fbc12758e77c30a8420f0bf7 *R/clustereval.R
-22c66d57d7d1458481394088320ddc5f *R/density.R
+c48e3230a0a05d55208731c4942e1ee1 *R/density.R
 c0c500f6699f6ef3f40dc8ede3e9f0cc *R/image_plots.R
 bd358c830df4df54c3b59e44cdf58ab6 *R/min_cut.R
 9c5f69b0dafcf0c10154e6395aab089d *R/multi_var_projections.R
@@ -10,14 +10,14 @@ bd358c830df4df54c3b59e44cdf58ab6 *R/min_cut.R
 86a3a817419f3881369c873af7e5474f *R/nodeplot.R
 6d61b4bf31bd2c406c266c410e8c34a4 *R/optimPPclust.R
 e36a27456a39ff81e663e9b4f63701f4 *R/prune.R
-50f73b0b8d3442c8dd6cafd96609dfa3 *build/partial.rdb
+d81f7ee6d000fbbb945cc27152b26d29 *build/partial.rdb
 f1fefaa37912976eff244e0fa6db7597 *data/breastcancer.RData
 32e8d3281612868446bd1fb3ba35147c *data/datalist
 6d18c2554adc74eee990b50bb0e2c384 *data/dermatology.RData
 de80bb047d4668b07f3d29f3d1ca5511 *data/optidigits.RData
 036056e075b8a0ebecc5134e0b3d93fa *data/pendigits.RData
 11ecf1ffa76c1c39cc60e10908ae89ad *data/yale.RData
-7ad4c31072284a0a271a235b14244688 *man/PPCI-package.Rd
+5f3853fd549b23c142762e43202da83d *man/PPCI-package.Rd
 692d80d2db2d24227556edf758416fea *man/add_subtree.Rd
 a0cd2273eaf33014eddfef7c284bd7ff *man/breastcancer.Rd
 ee46c20a10727cc501b425fa0d863bb0 *man/cluster_performance.Rd
