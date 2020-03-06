@@ -127,7 +127,7 @@ add_subtree <- function(sol, X, node, L, U, y, h, w, labels, node.numbers, trans
       }), pch = 16, cex = .5)
     }
 
-    if(node.numbers) text((L+U-w*.8)/2, y-h*.9, as.character(node), cex = .7)
+    if(node.numbers) text((L+U-w*.8)/2, y-h*.9, as.character(node), cex = 1.5)
   }
   else{
     if(ncol(X)>2) v2 <- rARPACK::eigs_sym(cov(X[sol$Nodes[[node]]$ixs,]-X[sol$Nodes[[node]]$ixs,]%*%sol$Nodes[[node]]$v%*%t(sol$Nodes[[node]]$v)), 1)$vectors[,1]
@@ -152,7 +152,7 @@ add_subtree <- function(sol, X, node, L, U, y, h, w, labels, node.numbers, trans
       }), pch = 16, cex = .5)
     }
 
-    if(node.numbers) text((L+U-w*1.1)/2, y-h*.9, as.character(node), cex = .7)
+    if(node.numbers) text((L+U-w*1.1)/2, y-h*.9, as.character(node), cex = 1.5)
 
     k1 <- which(((sol$model[,1]==(sol$model[node,1]+1))*(sol$model[,2]==(sol$model[node,2]*2-1)))==1)
     k2 <- which(((sol$model[,1]==(sol$model[node,1]+1))*(sol$model[,2]==sol$model[node,2]*2))==1)

@@ -79,7 +79,7 @@ node_plot <- function(sol, node, labels = NULL, transparency = NULL){
 
   # plot the projected data in the main body of the plot
 
-  par(mar = c(2, 2, 0, 2))
+  par(mar = c(3, 3, 0, 3))
 
   is.leaf = 1-sum((sol$model[,1]==(sol$model[node,1]+1))*(sol$model[,2]==(2*sol$model[node,2])))
 
@@ -93,32 +93,32 @@ node_plot <- function(sol, node, labels = NULL, transparency = NULL){
   if(is.null(labels)){
     if(is.leaf){
       if(sol$model[node,2]%%2){
-        if(transparency==0) plot(Xp, col = 4, tck = .02, yaxt = 'n', bty = 'n')
-        else plot(Xp, col = rgb(0, 0, 1, transparency), pch = 16, tck = .02, yaxt = 'n', bty = 'n')
+        if(transparency==0) plot(Xp, col = 4, tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
+        else plot(Xp, col = rgb(0, 0, 1, transparency), pch = 16, tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
       }
       else{
-        if(transparency==0) plot(Xp, col = 2, tck = .02, yaxt = 'n', bty = 'n')
-        else plot(Xp, col = rgb(1, 0, 0, transparency), pch = 16, tck = .02, yaxt = 'n', bty = 'n')
+        if(transparency==0) plot(Xp, col = 2, tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
+        else plot(Xp, col = rgb(1, 0, 0, transparency), pch = 16, tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
       }
     }
     else{
-      if(transparency==0) plot(Xp, col = (Xp[,1]<sol$Nodes[[node]]$b)*2+2, tck = .02, yaxt = 'n', bty = 'n')
+      if(transparency==0) plot(Xp, col = (Xp[,1]<sol$Nodes[[node]]$b)*2+2, tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
       else plot(Xp, col = sapply((Xp[,1]<sol$Nodes[[node]]$b)*2+2, function(c){
         cl = col2rgb(c)
         rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
-      }), pch = 16, tck = .02, yaxt = 'n', bty = 'n')
+      }), pch = 16, tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
     }
   }
   else{
-    if(transparency==0) plot(Xp, col = labels[sol$Nodes[[node]]$ixs], tck = .02, yaxt = 'n', bty = 'n')
+    if(transparency==0) plot(Xp, col = labels[sol$Nodes[[node]]$ixs], tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
     else plot(Xp, col = sapply(labels[sol$Nodes[[node]]$ixs], function(c){
       cl = col2rgb(c)
       rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
-    }), pch = 16, tck = .02, yaxt = 'n', bty = 'n')
+    }), pch = 16, tck = .02, yaxt = 'n', bty = 'n', cex.axis = 2)
   }
-  axis(2, labels = round(seq(min(Xp[,2]), min(Xp[,2])+(max(Xp[,2])-min(Xp[,2]))*450/512, length = 7), 1), at = seq(min(Xp[,2]), min(Xp[,2])+(max(Xp[,2])-min(Xp[,2]))*450/512, length = 7), tck = .02)
+  axis(2, labels = round(seq(min(Xp[,2]), min(Xp[,2])+(max(Xp[,2])-min(Xp[,2]))*450/512, length = 7), 1), at = seq(min(Xp[,2]), min(Xp[,2])+(max(Xp[,2])-min(Xp[,2]))*450/512, length = 7), tck = .02, cex.axis = 2)
   lines(den$x, den$y/max(den$y)*(max(Xp[,2])-min(Xp[,2]))+min(Xp[,2]), lwd = 2)
-  axis(4, labels = round(seq(0, max(den$y)*450/512, length = 7), 2), at = seq(min(Xp[,2]), min(Xp[,2])+(max(Xp[,2])-min(Xp[,2]))*450/512, length = 7), tck = .02)
+  axis(4, labels = round(seq(0, max(den$y)*450/512, length = 7), 2), at = seq(min(Xp[,2]), min(Xp[,2])+(max(Xp[,2])-min(Xp[,2]))*450/512, length = 7), tck = .02, cex.axis = 2)
   abline(h = min(Xp[,2]))
 
   if(!is.null(labels)){
@@ -148,35 +148,35 @@ node_plot <- function(sol, node, labels = NULL, transparency = NULL){
     abline(v = sol$Nodes[[node]]$b, col = rgb(.5, .5, .5), lty = 2, lwd = 2)
     par(mar = c(0, 0, 0, 0))
     plot(.05, cex = 0, ylim = c(0, 1), xlim = c(0, 1), bty = 'n', xaxt = 'n', yaxt = 'n')
-    text(.05, .95, paste('node: ', as.character(node)), pos = 4, offset = 0)
-    text(.05, .85, paste('depth: ', as.character(sol$model[node,1])), pos = 4, offset = 0)
-    text(.05, .75, paste('position: ', as.character(sol$Nodes[[node]]$location[2])), pos = 4, offset = 0)
-    text(.05, .65, paste('n: ', as.character(length(sol$Nodes[[node]]$ixs))), pos = 4, offset = 0)
-    if(sol$method=='MCDC') text(.05, .55, paste('variance ratio: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0)
-    else if(sol$method=='MDH') text(.05, .55, paste('relative depth: ', substr(as.character(sol$Nodes[[node]]$rel.dep), 1, 5)), pos = 4, offset = 0)
-    else if(sol$method=='NCutH') text(.05, .55, paste('normalised cut: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0)
+    text(.05, .95, paste('node: ', as.character(node)), pos = 4, offset = 0, cex = 2)
+    text(.05, .85, paste('depth: ', as.character(sol$model[node,1])), pos = 4, offset = 0, cex = 2)
+    text(.05, .75, paste('position: ', as.character(sol$Nodes[[node]]$location[2])), pos = 4, offset = 0, cex = 2)
+    text(.05, .65, paste('n: ', as.character(length(sol$Nodes[[node]]$ixs))), pos = 4, offset = 0, cex = 2)
+    if(sol$method=='MCDC') text(.05, .55, paste('variance ratio: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0, cex = 2)
+    else if(sol$method=='MDH') text(.05, .55, paste('relative depth: ', substr(as.character(sol$Nodes[[node]]$rel.dep), 1, 5)), pos = 4, offset = 0, cex = 2)
+    else if(sol$method=='NCutH') text(.05, .55, paste('normalised cut: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0, cex = 2)
     if(!is.null(labels)){
       prf = max(table(labels[sol$Nodes[[node]]$ixs]))/length(sol$Nodes[[node]]$ixs)
-      text(.05, .45, paste('cluster purity: ', substr(as.character(prf), 1, 5)), pos = 4, offset = 0)
+      text(.05, .45, paste('cluster purity: ', substr(as.character(prf), 1, 5)), pos = 4, offset = 0, cex = 2)
     }
-    else text(.05, .45, 'cluster purity: -', pos = 4, offset = 0)
+    else text(.05, .45, 'cluster purity: -', pos = 4, offset = 0, cex = 2)
   }
   else{
     abline(v = sol$Nodes[[node]]$b, col = 2, lwd = 2)
     par(mar = c(0, 0, 0, 0))
     plot(0, cex = 0, ylim = c(0, 1), xlim = c(0, 1), bty = 'n', xaxt = 'n', yaxt = 'n')
-    text(.05, .95, paste('node: ', as.character(node)), pos = 4, offset = 0)
-    text(.05, .85, paste('depth: ', as.character(sol$model[node,1])), pos = 4, offset = 0)
-    text(.05, .75, paste('position: ', as.character(sol$Nodes[[node]]$location[2])), pos = 4, offset = 0)
-    text(.05, .65, paste('n: ', as.character(length(sol$Nodes[[node]]$ixs))), pos = 4, offset = 0)
-    if(sol$method=='MCDC') text(.05, .55, paste('variance ratio: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0)
-    else if(sol$method=='MDH') text(.05, .55, paste('relative depth: ', substr(as.character(sol$Nodes[[node]]$rel.dep), 1, 5)), pos = 4, offset = 0)
-    else if(sol$method=='NCutH') text(.05, .55, paste('normalised cut: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0)
+    text(.05, .95, paste('node: ', as.character(node)), pos = 4, offset = 0, cex = 2)
+    text(.05, .85, paste('depth: ', as.character(sol$model[node,1])), pos = 4, offset = 0, cex = 2)
+    text(.05, .75, paste('position: ', as.character(sol$Nodes[[node]]$location[2])), pos = 4, offset = 0, cex = 2)
+    text(.05, .65, paste('n: ', as.character(length(sol$Nodes[[node]]$ixs))), pos = 4, offset = 0, cex = 2)
+    if(sol$method=='MCDC') text(.05, .55, paste('variance ratio: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0, cex = 2)
+    else if(sol$method=='MDH') text(.05, .55, paste('relative depth: ', substr(as.character(sol$Nodes[[node]]$rel.dep), 1, 5)), pos = 4, offset = 0, cex = 2)
+    else if(sol$method=='NCutH') text(.05, .55, paste('normalised cut: ', substr(as.character(sol$Nodes[[node]]$fval), 1, 5)), pos = 4, offset = 0, cex = 2)
     if(!is.null(labels)){
       prf = success_ratio((X[sol$Nodes[[node]]$ixs,]%*%sol$Nodes[[node]]$v<sol$Nodes[[node]]$b), labels[sol$Nodes[[node]]$ixs])
-      text(.05, .45, paste('success ratio: ', substr(as.character(prf[1]), 1, 5)), pos = 4, offset = 0)
+      text(.05, .45, paste('success ratio: ', substr(as.character(prf[1]), 1, 5)), pos = 4, offset = 0, cex = 2)
     }
-    else text(.05, .45, 'success ratio: -', pos = 4, offset = 0)
+    else text(.05, .45, 'success ratio: -', pos = 4, offset = 0, cex = 2)
   }
   par(op)
 }
@@ -198,7 +198,7 @@ hp_plot <- function(sol, labels = NULL, transparency = NULL){
 
   if(is.null(transparency)) transparency = 0
 
-  par(mar = c(2, 2, 2, 2))
+  par(mar = c(2.8, 2.8, 2.8, 2.8))
 
   # if labels are given, then ensure they are integer valued for the purpose of colour plots
 
@@ -231,23 +231,23 @@ hp_plot <- function(sol, labels = NULL, transparency = NULL){
   else den <- density(sol$fitted[,1])
 
   if(is.null(labels)){
-    if(transparency==0) plot(sol$fitted, col = sol$cluster*2, tck = .02, yaxt = 'n')
+    if(transparency==0) plot(sol$fitted, col = sol$cluster*2, tck = .02, yaxt = 'n', cex.lab = 2, cex.axis = 1.5)
     else plot(sol$fitted, col = sapply(sol$cluster*2, function(c){
       cl = col2rgb(c)
       rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
-    }), pch = 16, tck = .02, yaxt = 'n')
+    }), pch = 16, tck = .02, yaxt = 'n', cex.lab = 2, cex.axis = 1.5)
   }
   else{
-    if(transparency==0) plot(sol$fitted, col = labels, tck = .02, yaxt = 'n')
+    if(transparency==0) plot(sol$fitted, col = labels, tck = .02, yaxt = 'n', cex.lab = 2, cex.axis = 1.5)
     else plot(sol$fitted, col = sapply(labels, function(c){
       cl = col2rgb(c)
       rgb(cl[1]/255, cl[2]/255, cl[3]/255, transparency)
-    }), pch = 16, tck = .02, yaxt = 'n')
+    }), pch = 16, tck = .02, yaxt = 'n', cex.lab = 2, cex.axis = 1.5)
   }
   abline(v = sol$b, col = 2, lwd = 2)
-  axis(2, labels = round(seq(min(sol$fitted[,2]), min(sol$fitted[,2])+(max(sol$fitted[,2])-min(sol$fitted[,2]))*450/512, length = 7), 1), at = seq(min(sol$fitted[,2]), min(sol$fitted[,2])+(max(sol$fitted[,2])-min(sol$fitted[,2]))*450/512, length = 7), tck = .02)
+  axis(2, labels = round(seq(min(sol$fitted[,2]), min(sol$fitted[,2])+(max(sol$fitted[,2])-min(sol$fitted[,2]))*450/512, length = 7), 1), at = seq(min(sol$fitted[,2]), min(sol$fitted[,2])+(max(sol$fitted[,2])-min(sol$fitted[,2]))*450/512, length = 7), tck = .02, cex.axis = 1.5)
   lines(den$x, den$y/max(den$y)*(max(sol$fitted[,2])-min(sol$fitted[,2]))+min(sol$fitted[,2]), lwd = 2)
-  axis(4, labels = round(seq(0, max(den$y)*450/512, length = 7), 2), at = seq(min(sol$fitted[,2]), min(sol$fitted[,2])+(max(sol$fitted[,2])-min(sol$fitted[,2]))*450/512, length = 7), tck = .02)
+  axis(4, labels = round(seq(0, max(den$y)*450/512, length = 7), 2), at = seq(min(sol$fitted[,2]), min(sol$fitted[,2])+(max(sol$fitted[,2])-min(sol$fitted[,2]))*450/512, length = 7), tck = .02, cex.axis = 1.5)
   abline(h = min(sol$fitted[,2]))
 
   if(!is.null(labels)){
@@ -272,9 +272,9 @@ hp_plot <- function(sol, labels = NULL, transparency = NULL){
 
   # add details of the solutions
 
-  if(sol$method=='MCDC') title(main = paste('variance ratio: ', substr(as.character(sol$fval), 1, 5), 'success ratio: ', substr(as.character(prf[1]), 1, 5)))
-  else if(sol$method=='MDH') title(main = paste('relative depth: ', substr(as.character(sol$rel.dep), 1, 5), 'success ratio: ', substr(as.character(prf[1]), 1, 5)))
-  else if(sol$method=='NCutH') title(main = paste('normalised cut: ', substr(as.character(sol$fval), 1, 5), 'success ratio: ', substr(as.character(prf[1]), 1, 5)))
+  if(sol$method=='MCDC') title(main = paste('variance ratio: ', substr(as.character(sol$fval), 1, 5), 'success ratio: ', substr(as.character(prf[1]), 1, 5)), cex.main = 2)
+  else if(sol$method=='MDH') title(main = paste('relative depth: ', substr(as.character(sol$rel.dep), 1, 5), 'success ratio: ', substr(as.character(prf[1]), 1, 5)), cex.main = 2)
+  else if(sol$method=='NCutH') title(main = paste('normalised cut: ', substr(as.character(sol$fval), 1, 5), 'success ratio: ', substr(as.character(prf[1]), 1, 5)), cex.main = 2)
 
   par(op)
 }

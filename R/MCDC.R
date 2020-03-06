@@ -358,8 +358,8 @@ mch <- function(X, v0 = NULL, minsize = NULL, verb = NULL, labels = NULL, maxit 
 
   # if there are fewer than 2*minsize data, do not split
 
-  if(is.vector(X)) n <- 1
-  else n <- nrow(X)
+  if(is.vector(X)) X <- matrix(X, nrow = 1)
+  n <- nrow(X)
   if(n<(2*params$nmin)){
     return(list(cluster = numeric(nrow(X)) + 1, v = numeric(ncol(X))+1/sqrt(ncol(X)), b = 0, params = list(nmin = 1), fval = 0, method = 'MCDC', data = X, fitted = X[,1:2]))
   }

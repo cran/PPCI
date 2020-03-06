@@ -488,8 +488,8 @@ mdh <- function(X, v0 = NULL, minsize = NULL, bandwidth = NULL, alphamin = NULL,
 
   # if the data contain fewer than 2*minsize points, do not split
 
-  if(is.vector(X)) n <- 1
-  else n <- nrow(X)
+  if(is.vector(X)) X <- matrix(X, nrow = 1)
+  n <- nrow(X)
   if(n<(2*params$nmin)){
     v <- numeric(ncol(X)) + 1/sqrt(ncol(X))
     b <- mean(X%*%v)

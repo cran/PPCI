@@ -229,8 +229,8 @@ ncuth <- function(X, v0 = NULL, s = NULL, minsize = NULL, verb = NULL, labels = 
   else if(is.numeric(minsize) && length(minsize)==1) params$nmin <- minsize
   else stop('minsize must be a positive integer or a function of the data being split')
 
-  if(is.vector(X)) n <- 1
-  else n <- nrow(X)
+  if(is.vector(X)) X <- matrix(X, nrow = 1)
+  n <- nrow(X)
 
   # if the data contain fewer than 2*nmin points then don't split
 
